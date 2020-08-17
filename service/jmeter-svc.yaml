@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jmeter
+  labels:
+    app: jmeter
+spec:
+  clusterIP: None
+  selector:
+    app: jmeter
+  ports:
+  - name: jmeter-1099
+    port: 1099
+  - name: jmeter-4000
+    port: 4000

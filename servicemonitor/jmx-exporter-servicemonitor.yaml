@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: jmxexporter
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      jmxexporter: enabled
+  endpoints:
+  - port: jmxexporter
+    path: /metrics
+    interval: 10s
+    honorLabels: true

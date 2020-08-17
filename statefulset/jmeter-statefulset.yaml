@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jmeter
+  labels:
+    app: jmeter
+spec:
+  serviceName: "jmeter"
+  replicas: 4
+  selector:
+    matchLabels:
+      app: jmeter
+  template:
+    metadata:
+      labels:
+        app: jmeter
+    spec:
+      containers:
+      - name: jmeter
+        image: jmeter-base:local-v1
+        command: ["/bin/bash", "-c", "./jmeter-server"]
+        ports:
+        - name: jmeter-1099
+          containerPort: 1099
+        - name: jmeter-4000
+          containerPort: 4000

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  labels:
+    app: zookeeper
+spec:
+  serviceName: "zookeeper"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+      - name: zookeeper
+        image: zookeeper-base:local-v1
+        command: ["/bin/bash", "start-zookeeper.sh"]
+        ports:
+        - name: listener
+          containerPort: 2181
+        - name: zookeeper-2888
+          containerPort: 2888
+        - name: zookeeper-3888
+          containerPort: 3888
+        - name: jmxexporter
+          containerPort: 7171

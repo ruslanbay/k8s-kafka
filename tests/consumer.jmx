@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer" enabled="true">
+        <intProp name="calcMode">1</intProp>
+        <doubleProp>
+          <name>throughput</name>
+          <value>30000.0</value>
+          <savedValue>0.0</savedValue>
+        </doubleProp>
+      </ConstantThroughputTimer>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptestnow</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">300</stringProp>
+        <stringProp name="ThreadGroup.delay">0</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Sampler" enabled="true">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="script">import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+
+
+Properties props = new Properties();
+props.put(&quot;bootstrap.servers&quot;, &quot;kafka-0.kafka:9092,kafka-1.kafka:9092&quot;);
+props.put(&quot;group.id&quot;, &quot;test-consumer-group&quot;);
+props.put(&quot;enable.auto.commit&quot;, &quot;true&quot;);
+props.put(&quot;auto.commit.interval.ms&quot;, &quot;1000&quot;);
+props.put(&quot;session.timeout.ms&quot;, &quot;30000&quot;);
+props.put(&quot;key.deserializer&quot;, &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);
+props.put(&quot;value.deserializer&quot;, &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);
+
+props.put(&quot;security.protocol&quot;, &quot;SSL&quot;);
+props.put(&quot;ssl.truststore.location&quot;, &quot;/certs/kafkaCA-trusted.jks&quot;);
+props.put(&quot;ssl.truststore.password&quot;, &quot;kafkapilot&quot;);
+props.put(&quot;ssl.truststore.type&quot;, &quot;JKS&quot;);
+props.put(&quot;ssl.keystore.location&quot;, &quot;/certs/kafka-consumer.jks&quot;);
+props.put(&quot;ssl.keystore.password&quot;, &quot;kafkapilot&quot;);
+props.put(&quot;ssl.keystore.type&quot;, &quot;JKS&quot;);
+
+KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;String, String&gt;(props);
+
+//Kafka consumer subscribes list of topics here
+consumer.subscribe(Arrays.asList(&quot;topicname&quot;));
+
+//Display data to the console
+//int i = 0;
+//while (true)
+//{
+//  ConsumerRecords&lt;String, String&gt; records = consumer.poll(100);
+//  for (ConsumerRecord&lt;String, String&gt; record : records)
+//  {
+//    System.out.printf(&quot;offset = %d, key = %s, value = %s\n&quot;, record.offset(), record.key(), record.value());
+//  }
+//}
+
+//Save the data to a file
+long t = System.currentTimeMillis();
+long end = t + 5000;
+f = new FileOutputStream(&quot;/dev/null&quot;, true);
+p = new PrintStream(f);
+while (System.currentTimeMillis()&lt;end) 
+{
+  ConsumerRecords&lt;String, String&gt; records = consumer.poll(100);
+  for (ConsumerRecord&lt;String, String&gt; record : records)
+  {
+      p.println( &quot;offset = &quot; + record.offset() +&quot; value = &quot; + record.value());
+  }
+  consumer.commitSync();
+}
+p.close();
+f.close();
+consumer.close();
+</stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

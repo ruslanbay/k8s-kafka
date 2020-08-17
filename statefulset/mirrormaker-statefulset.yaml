@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mirrormaker
+  labels:
+    app: mirrormaker
+spec:
+  serviceName: mirrormaker
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mirrormaker
+  template:
+    metadata:
+      labels:
+        app: mirrormaker
+    spec:
+      containers:
+      - name: zookeeper
+        image: kafka-base:local-v1
+        command: ["bin/zookeeper-server-start.sh"]
+        args: ["config/zookeeper.properties"]
+      - name: kafka
+        image: kafka-base:local-v1
+        command: ["bin/kafka-server-start.sh"]
+        args: ["config/server.properties"]
+      - name: connect
+        image: kafka-base:local-v1
+        command: ["bin/connect-distributed.sh"]
+        args: ["/config/connect-distributed.properties"]

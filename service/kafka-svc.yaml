@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+    jmxexporter: enabled
+spec:
+  clusterIP: None
+  selector:
+    app: kafka
+  ports:
+  - name: listener
+    port: 9092
+  - name: jmxexporter
+    port: 7171
