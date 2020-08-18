@@ -16,8 +16,8 @@
   "editable": true,
   "gnetId": 11074,
   "graphTooltip": 0,
-  "id": 26,
-  "iteration": 1597674235597,
+  "id": 25,
+  "iteration": 1597770388301,
   "links": [
     {
       "asDropdown": false,
@@ -201,7 +201,7 @@
         "y": 11
       },
       "hiddenSeries": false,
-      "id": 240,
+      "id": 187,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -211,8 +211,6 @@
         "min": true,
         "rightSide": false,
         "show": true,
-        "sort": "max",
-        "sortDesc": true,
         "total": false,
         "values": true
       },
@@ -225,6 +223,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
+      "repeat": null,
       "repeatDirection": "h",
       "seriesOverrides": [],
       "spaceLength": 10,
@@ -236,7 +235,7 @@
           "hide": false,
           "instant": false,
           "interval": "",
-          "legendFormat": "({{pod}}) messagesInTotal",
+          "legendFormat": "{{pod}}",
           "refId": "A"
         }
       ],
@@ -244,7 +243,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Received messages per second",
+      "title": "Received Messages",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -284,7 +283,6 @@
     {
       "aliasColors": {},
       "bars": false,
-      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
       "datasource": "prometheus",
@@ -292,17 +290,11 @@
       "fieldConfig": {
         "defaults": {
           "custom": {},
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "",
-              "url": ""
-            }
-          ]
+          "links": []
         },
         "overrides": []
       },
-      "fill": 0,
+      "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 10,
@@ -311,18 +303,16 @@
         "y": 21
       },
       "hiddenSeries": false,
-      "id": 187,
+      "id": 192,
+      "interval": "",
       "legend": {
         "alignAsTable": true,
         "avg": true,
         "current": false,
-        "hideZero": false,
         "max": true,
         "min": true,
         "rightSide": false,
         "show": true,
-        "sort": "max",
-        "sortDesc": true,
         "total": false,
         "values": true
       },
@@ -332,11 +322,9 @@
       "nullPointMode": "null",
       "percentage": false,
       "pluginVersion": "7.1.0",
-      "pointradius": 2,
+      "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "repeat": null,
-      "repeatDirection": "h",
       "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
@@ -344,24 +332,22 @@
       "targets": [
         {
           "expr": "rate(kafka_server_brokertopicmetrics_bytesin_total{topic=\"\"}[1m])",
-          "hide": false,
-          "instant": false,
           "interval": "",
-          "legendFormat": "({{pod}}) bytesInTotal",
-          "refId": "A"
+          "legendFormat": "{{pod}} (bytes in)",
+          "refId": "C"
         },
         {
           "expr": "-rate(kafka_server_brokertopicmetrics_bytesout_total{topic=\"\"}[1m])",
           "interval": "",
-          "legendFormat": "({{pod}}) bytesOutTotal",
-          "refId": "B"
+          "legendFormat": "{{pod}} (bytes out)",
+          "refId": "A"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "In/Out bytes per second",
+      "title": "Byets In/Out",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -377,8 +363,8 @@
       },
       "yaxes": [
         {
-          "format": "short",
-          "label": null,
+          "format": "Bps",
+          "label": "- bytes out / + bytes in",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -390,7 +376,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -422,7 +408,7 @@
       "pluginVersion": "7.1.0",
       "timeFrom": null,
       "timeShift": null,
-      "title": "8. System",
+      "title": "System",
       "type": "text"
     },
     {
@@ -434,12 +420,10 @@
         "iowait": "#EAB839",
         "irq": "#BF1B00",
         "nice": "#C15C17",
-        "sdb_每秒I/O操作%": "#d683ce",
         "softirq": "#E24D42",
         "steal": "#FCE2DE",
         "system": "#508642",
-        "user": "#5195CE",
-        "磁盘花费在I/O操作占比": "#ba43a9"
+        "user": "#5195CE"
       },
       "bars": false,
       "dashLength": 10,
@@ -647,7 +631,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "6.1.1 CPU Usage by processess",
+      "title": "CPU Usage by processess",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -687,11 +671,7 @@
       }
     },
     {
-      "aliasColors": {
-        "15分钟": "#6ED0E0",
-        "1分钟": "#BF1B00",
-        "5分钟": "#CCA300"
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -818,16 +798,7 @@
       }
     },
     {
-      "aliasColors": {
-        "192.168.200.241:9100_总内存": "dark-red",
-        "内存_Avaliable": "#6ED0E0",
-        "内存_Cached": "#EF843C",
-        "内存_Free": "#629E51",
-        "内存_Total": "#6d1f62",
-        "内存_Used": "#eab839",
-        "可用": "#9ac48a",
-        "总内存": "#bf1b00"
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1055,6 +1026,99 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "prometheus",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 83
+      },
+      "hiddenSeries": false,
+      "id": 220,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "jvm_classes_loaded",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Classes loaded",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1068,7 +1132,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 83
+        "y": 91
       },
       "hiddenSeries": false,
       "id": 222,
@@ -1153,102 +1217,6 @@
     },
     {
       "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "prometheus",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {},
-          "links": []
-        },
-        "overrides": []
-      },
-      "fill": 0,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 92
-      },
-      "hiddenSeries": false,
-      "id": 220,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "percentage": false,
-      "pluginVersion": "7.1.0",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "jvm_classes_loaded",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Classes loaded",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {
-        "192.168.10.227:9100_em1_in下载": "super-light-green",
-        "192.168.10.227:9100_em1_out上传": "dark-blue"
-      },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -1637,12 +1605,10 @@
         "iowait": "#EAB839",
         "irq": "#BF1B00",
         "nice": "#C15C17",
-        "sdb_每秒I/O操作%": "#d683ce",
         "softirq": "#E24D42",
         "steal": "#FCE2DE",
         "system": "#508642",
-        "user": "#5195CE",
-        "磁盘花费在I/O操作占比": "#ba43a9"
+        "user": "#5195CE"
       },
       "bars": false,
       "dashLength": 10,
@@ -1759,7 +1725,7 @@
       },
       "fontSize": "110%",
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 12,
         "x": 0,
         "y": 142
@@ -1960,7 +1926,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 147
+        "y": 148
       },
       "hiddenSeries": false,
       "id": 174,
@@ -2077,7 +2043,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 160
+        "y": 161
       },
       "height": "300",
       "hiddenSeries": false,
@@ -2198,7 +2164,7 @@
         "h": 12,
         "w": 12,
         "x": 0,
-        "y": 173
+        "y": 174
       },
       "height": "300",
       "hiddenSeries": false,
@@ -2319,7 +2285,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 185
+        "y": 186
       },
       "height": "300",
       "hiddenSeries": false,
@@ -2547,7 +2513,7 @@
         "definition": "",
         "hide": 2,
         "includeAll": false,
-        "label": "环境",
+        "label": "label-2",
         "multi": false,
         "multiFormat": "regex values",
         "name": "env",
@@ -2577,7 +2543,7 @@
         "definition": "label_values(node_exporter_build_info{env=~'$env'},name)",
         "hide": 2,
         "includeAll": false,
-        "label": "名称",
+        "label": "label-1",
         "multi": true,
         "multiFormat": "regex values",
         "name": "name",
@@ -2627,5 +2593,5 @@
   "timezone": "browser",
   "title": "k8s-kafka",
   "uid": "lDyL4C6Wk",
-  "version": 6
+  "version": 4
 }
