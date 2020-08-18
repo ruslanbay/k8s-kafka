@@ -275,7 +275,7 @@ kubectl get pods -w -n monitoring
 ```
 Для сбора метрик Kafka и Zookeeper будем использовать JMX Exporter. Чтобы Prometheus получил доступ к экспортируемым метрикам необходимо добавить ServiceMonitor:
 ```bash
-k apply -f servicemonitor/jmx-exporter-servicemonitor.yaml
+k apply -f https://raw.githubusercontent.com/kildibaev/k8s-kafka/master/servicemonitor/jmx-exporter-servicemonitor.yaml
 ```
 Создадим сервис, чтобы получить доступ к веб-интерфейсу Grafana из виртуальной машины:
 ```bash
@@ -506,4 +506,6 @@ k delete svc grafana jmeter kafka mirrormaker zookeeper
 k delete servicemonitor jmxexporter
 ```
 <br><br><br>
-<i>Всем добра! Не болейте.</i>
+[linkedin: kildibaev](https://www.linkedin.com/in/kildibaev/)
+
+Всем добра! Не болейте.
