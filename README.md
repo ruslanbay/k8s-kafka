@@ -6,11 +6,13 @@
 
 Инструкция описывает создание виртуальной машины в VirtualBox, установку и настройку операционной системы, установку Docker, Kubernetes и системы мониторинга. В Kubernetes развертывается два кластера Apache Kafka: "production" и "backup". Для репликации сообщений из production в backup используется MirrorMaker 2.0. Взаимодействие между узлами production кластера защищено TLS. К сожалению, не могу выложить в Git скрипт для генерирования сертификатов. В качестве примера можете использовать сертификаты из архива certs/certs.tar.gz. В самом конце инструкции описывается развертывание кластера Jmeter и запуск тестового сценария.
 
+Исходники доступны в репозитории: [github.com/kildibaev/k8s-kafka](https://github.com/kildibaev/k8s-kafka)
+
 Инструкция расcчитана на новичков в Kubernetes, поэтому если вы уже имеете опыт работы с контейнерами, то можете сразу перейти в раздел ["12. Разворачиваем кластер Apache Kafka"](#deploy-cluster).
 
 ### Q&A:
 - <b>Почему используется Ubuntu?</b> Изначально я развернул Kubernetes в CentOS 7, но после одного из обновлений окружение перестало работать. К тому же я заметил, что в CentOS нагрузочные тесты, запущенные в Jmeter, ведут себя непредсказуемо. Если сталкивались, пожалуйста, напишите в комментариях возможное решение этой проблемы. В Ubuntu всё намного стабильнее.
-- <b>Почему не k3s или MicroK8s?</b> Если коротко, ни k3s, ни MicroK8s "из коробки" не умеют работать с локальным Docker-репозиторием.
+- <b>Почему не k3s или MicroK8s?</b> Если коротко, ни k3s, ни MicroK8s из коробки не умеют работать с локальным Docker-репозиторием.
 - <b>Почему не оптимизированы параметры конфигурации?</b> Я намеренно использовал параметры по умолчанию где это возможно. 
 - <b>Почему Flannel?</b> Я новичок в kubernetes и Flannel - единственный плагин, который мне удалось завести без проблем.
 - <b>Почему Docker, а не CRI-O?</b> Мне интересен CRI-O и я планирую изучить его в будущем.
@@ -70,12 +72,17 @@
 <details>
   <summary>Показать скриншоты</summary>
 
-  ![''](img/14.PNG)
-  ![''](img/15.PNG)
-  ![''](img/16.PNG)
-  ![''](img/17.PNG)
-  ![''](img/18.PNG)
-  ![''](img/19.PNG)
+  ![''](img/14.png)
+
+  ![''](img/15.png)
+
+  ![''](img/16.png)
+
+  ![''](img/17.png)
+
+  ![''](img/18.png)
+
+  ![''](img/19.png)
 </details>
 
 ### <a name="install-ubuntu">2. Установка Ubuntu Server 20.04</a>
@@ -87,17 +94,29 @@
   <summary>Показать скриншоты</summary>
 
   ![''](img/1.PNG)
+
   ![''](img/2.PNG)
+
   ![''](img/3.PNG)
+
   ![''](img/4.PNG)
+
   ![''](img/5.PNG)
+
   ![''](img/6.PNG)
+
   ![''](img/7.PNG)
+
   ![''](img/8.PNG)
+
   ![''](img/9.PNG)
+
   ![''](img/10.PNG)
+
   ![''](img/11.PNG)
+
   ![''](img/12.PNG)
+
   ![''](img/13.PNG)
 </details>
 
@@ -258,7 +277,7 @@ kubectl get pods -w -n monitoring
 ```
 Для сбора метрик Kafka и Zookeeper будем использовать JMX Exporter. Чтобы Prometheus получил доступ к экспортируемым метрикам необходимо добавить ServiceMonitor:
 ```bash
-k apply -f servicemonitor/jmx-exporter-servicemonitor.yaml
+k apply -f https://raw.githubusercontent.com/kildibaev/k8s-kafka/master/servicemonitor/jmx-exporter-servicemonitor.yaml
 ```
 Создадим сервис, чтобы получить доступ к веб-интерфейсу Grafana из виртуальной машины:
 ```bash
@@ -268,7 +287,7 @@ kubectl apply -f https://raw.githubusercontent.com/kildibaev/k8s-kafka/master/se
 
 Выполним проброс порта, чтобы получить доступ к Grafana на хост машине:
 
-![''](img/25.PNG)
+![''](img/25.png)
 
 Теперь веб-интерфейс Grafana доступен на хост машине по адресу http://127.0.0.1:3000
 
@@ -489,4 +508,6 @@ k delete svc grafana jmeter kafka mirrormaker zookeeper
 k delete servicemonitor jmxexporter
 ```
 <br><br><br>
-<i>Всем добра! Не болейте.</i>
+[linkedin: kildibaev](https://www.linkedin.com/in/kildibaev/)
+
+Всем добра! Не болейте.
