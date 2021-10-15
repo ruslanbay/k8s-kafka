@@ -6,7 +6,7 @@
 
 Инструкция описывает создание виртуальной машины в VirtualBox, установку и настройку операционной системы, установку Docker, Kubernetes и системы мониторинга. В Kubernetes развертывается два кластера Apache Kafka: "production" и "backup". Для репликации сообщений из production в backup используется MirrorMaker 2.0. Взаимодействие между узлами production кластера защищено TLS. К сожалению, не могу выложить в Git скрипт для генерирования сертификатов. В качестве примера можете использовать сертификаты из архива certs/certs.tar.gz. В самом конце инструкции описывается развертывание кластера Jmeter и запуск тестового сценария.
 
-Исходники доступны в репозитории: [github.com/kildibaev/k8s-kafka](https://github.com/kildibaev/k8s-kafka)
+Исходники доступны в репозитории: [github.com/ruslanbay/k8s-kafka](https://github.com/ruslanbay/k8s-kafka)
 
 Инструкция расcчитана на новичков в Kubernetes, поэтому если вы уже имеете опыт работы с контейнерами, то можете сразу перейти в раздел ["12. Разворачиваем кластер Apache Kafka"](#deploy-cluster).
 
@@ -277,11 +277,11 @@ kubectl get pods -w -n monitoring
 ```
 Для сбора метрик Kafka и Zookeeper будем использовать JMX Exporter. Чтобы Prometheus получил доступ к экспортируемым метрикам необходимо добавить ServiceMonitor:
 ```bash
-k apply -f https://raw.githubusercontent.com/kildibaev/k8s-kafka/master/servicemonitor/jmx-exporter-servicemonitor.yaml
+k apply -f https://raw.githubusercontent.com/ruslanbay/k8s-kafka/master/servicemonitor/jmx-exporter-servicemonitor.yaml
 ```
 Создадим сервис, чтобы получить доступ к веб-интерфейсу Grafana из виртуальной машины:
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/kildibaev/k8s-kafka/master/service/grafana-svc.yaml
+kubectl apply -f https://raw.githubusercontent.com/ruslanbay/k8s-kafka/master/service/grafana-svc.yaml
 ```
 После запуска сервиса Grafana будет доступна из гостевой системы по адресу http://localhost:32000
 
@@ -291,14 +291,14 @@ kubectl apply -f https://raw.githubusercontent.com/kildibaev/k8s-kafka/master/se
 
 Теперь веб-интерфейс Grafana доступен на хост машине по адресу http://127.0.0.1:3000
 
-Для просмотра метрик в Grafana можете воспользоваться готовым дашбордом. Для этого перейдите на страницу http://127.0.0.1:3000/dashboard/import и в поле "Import via panel json" скопируйте содержимое файла [grafana-dashboard.json](https://raw.githubusercontent.com/kildibaev/k8s-kafka/master/config/grafana-dashboard.json)
+Для просмотра метрик в Grafana можете воспользоваться готовым дашбордом. Для этого перейдите на страницу http://127.0.0.1:3000/dashboard/import и в поле "Import via panel json" скопируйте содержимое файла [grafana-dashboard.json](https://raw.githubusercontent.com/ruslanbay/k8s-kafka/master/config/grafana-dashboard.json)
 
 
 ### <a name="deploy-cluster">12. Разворачиваем кластер Apache Kafka</a>
 
 ```bash
 # Скачиваем содержимое репозитория
-git clone https://github.com/kildibaev/k8s-kafka.git $HOME/k8s-kafka
+git clone https://github.com/ruslanbay/k8s-kafka.git $HOME/k8s-kafka
 cd $HOME/k8s-kafka
 ```
 
@@ -508,6 +508,6 @@ k delete svc grafana jmeter kafka mirrormaker zookeeper
 k delete servicemonitor jmxexporter
 ```
 <br><br><br>
-[linkedin: kildibaev](https://www.linkedin.com/in/kildibaev/)
+[linkedin: ruslanbay](https://www.linkedin.com/in/ruslanbay/)
 
 Всем добра! Не болейте.
