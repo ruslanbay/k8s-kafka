@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath">/app/kafka/libs</stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(threadsNumber, 100)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Once Only Controller" enabled="true"/>
+        <hashTree>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="init" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">false</stringProp>
+            <stringProp name="script">
+
+log.info(&quot;Let&apos;s get started!&quot;);
+
+/*
+ * to run kafka producer:
+ * nohup /app/jmeter/bin/jmeter -n \
+ * -t /home/appadmin/user/test.jmx \
+ * -JthreadsNumber=100    \
+ * -Jrole=&apos;producer&apos;      \
+ * -Jtopic=&apos;topicname&apos;    \
+ * -JtestDurationSec=300  \
+ * -JmsgSizeBytes=1024    \
+ * -JmsgRatePerThread=900 \
+ * -r -Jremote_hosts=k10-stan-kfk404lv:1099,k10-stan-kfk405lv:1099,k10-stan-kfk406lv:1099
+ */
+
+/*
+ * to run kafka consumer:
+ * nohup /app/jmeter/bin/jmeter -n \
+ * -t /home/appadmin/user/test.jmx \
+ * -JthreadsNumber=100    \
+ * -Jrole=&apos;consumer&apos;      \
+ * -Jtopic=&apos;topicname&apos;    \
+ * -JtestDurationSec=300  \
+ * -r -Jremote_hosts=k10-stan-kfk404lv:1099,k10-stan-kfk405lv:1099,k10-stan-kfk406lv:1099
+ */</stringProp>
+            <stringProp name="TestPlan.comments">Execute this code only once</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+        </hashTree>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="if -Jrole=&apos;producer&apos;" enabled="true">
+          <stringProp name="TestPlan.comments">execute this if role is &quot;producer&quot;</stringProp>
+          <stringProp name="IfController.condition">${ __groovy( props.get(&quot;role&quot;).equals(&quot;producer&quot;), )}</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
+        </IfController>
+        <hashTree>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Action" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">
+
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.RandomStringUtils;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
+import org.apache.kafka.common.header.Headers;
+import org.apache.kafka.common.header.internals.RecordHeaders;
+
+Properties props = new Properties();
+props.put(&quot;bootstrap.servers&quot;, &quot;k10-stan-kfk401lv:9092,k10-stan-kfk402lv:9092,k10-stan-kfk403lv:9092&quot;);
+props.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+props.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+props.put(&quot;compression.type&quot;, &quot;none&quot;);
+props.put(&quot;batch.size&quot;, &quot;51200&quot;);
+props.put(&quot;linger.ms&quot;, &quot;5&quot;);
+props.put(&quot;buffer.memory&quot;, &quot;33554432&quot;);
+props.put(&quot;acks&quot;, &quot;all&quot;);
+props.put(&quot;send.buffer.bytes&quot;, &quot;131072&quot;);
+props.put(&quot;receive.buffer.bytes&quot;, &quot;32768&quot;);
+props.put(&quot;security.protocol&quot;, &quot;SSL&quot;);
+props.put(&quot;ssl.key.password&quot;, &quot;123456&quot;);
+props.put(&quot;ssl.keystore.location&quot;, &quot;/home/appadmin/user/tls/private/pub-k10.pfx&quot;);
+props.put(&quot;ssl.keystore.password&quot;, &quot;123456&quot;);
+props.put(&quot;ssl.keystore.type&quot;, &quot;PKCS12&quot;);
+props.put(&quot;ssl.truststore.location&quot;, &quot;/home/appadmin/user/tls/certs/kafka-trust.pfx&quot;);
+props.put(&quot;ssl.truststore.password&quot;, &quot;123456&quot;);
+props.put(&quot;ssl.truststore.type&quot;, &quot;PKCS12&quot;);
+
+KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;String, String&gt;(props);
+
+String topic = props.get(&quot;topic&quot;, &quot;topicname&quot;);
+
+int msgSizeBytes = Integer.valueOf(${__P(msgSizeBytes, 1024)}); // default: 1024
+String message = RandomStringUtils.randomAlphabetic(msgSizeBytes);
+
+// List&lt;Header&gt; headers = new ArrayList&lt;Header&gt;();
+// headers.add(new RecordHeader(&quot;schemaVersion&quot;, &quot;1.0&quot;.getBytes()));
+// headers.add(new RecordHeader(&quot;messageType&quot;,&quot;TEST_MESSAGE&quot;.getBytes()));
+// Date latestdate = new Date();
+// ProducerRecord&lt;String, String&gt; producerRecord = new ProducerRecord&lt;String, String&gt;(topicname, partition-integer, latestdate.getTime(), &quot;key&quot;, message, headers);
+ProducerRecord&lt;String, String&gt; producerRecord = new ProducerRecord&lt;String, String&gt;(topic, message);
+
+// messages per second per one thread, default: 900
+int msgRatePerThread = Integer.valueOf(${__P(msgRatePerThread, 900)});
+
+long t = System.currentTimeMillis();
+long testDurationSec = Long.valueOf(${__P(testDurationSec, 300)}); // default: 300
+long end = testDurationSec * 1000 + t;
+
+long sleepTime = 1000000000L/msgRatePerThread;
+
+while(System.currentTimeMillis() &lt; end) {
+  producer.send(producerRecord);
+  TimeUnit.NANOSECONDS.sleep(sleepTime);
+}
+
+producer.close();
+</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+        </hashTree>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="if -Jrole=&apos;consumer&apos;" enabled="true">
+          <stringProp name="TestPlan.comments">execute this if role is &quot;consumer&quot;</stringProp>
+          <stringProp name="IfController.condition">${ __groovy( props.get(&quot;role&quot;).equals(&quot;consumer&quot;), )}</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
+        </IfController>
+        <hashTree>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="Action" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">
+
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+
+Properties props = new Properties();
+props.put(&quot;bootstrap.servers&quot;, &quot;k10-stan-kfk401lv:9092,k10-stan-kfk402lv:9092,k10-stan-kfk403lv:9092&quot;);
+props.put(&quot;key.deserializer&quot;, &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);
+props.put(&quot;value.deserializer&quot;, &quot;org.apache.kafka.common.serialization.StringDeserializer&quot;);
+props.put(&quot;group.id&quot;, &quot;perftest&quot;);
+props.put(&quot;security.protocol&quot;, &quot;SSL&quot;);
+props.put(&quot;ssl.key.password&quot;, &quot;123456&quot;);
+props.put(&quot;ssl.keystore.location&quot;, &quot;/home/appadmin/user/tls/private/pub-k10.pfx&quot;);
+props.put(&quot;ssl.keystore.password&quot;, &quot;123456&quot;);
+props.put(&quot;ssl.keystore.type&quot;, &quot;PKCS12&quot;);
+props.put(&quot;ssl.truststore.location&quot;, &quot;/home/appadmin/user/tls/certs/kafka-trust.pfx&quot;);
+props.put(&quot;ssl.truststore.password&quot;, &quot;123456&quot;);
+props.put(&quot;ssl.truststore.type&quot;, &quot;PKCS12&quot;);
+
+KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;String, String&gt;(props);
+
+String topic = props.get(&quot;topic&quot;, &quot;topicname&quot;);
+
+consumer.subscribe(Arrays.asList(topic));
+
+long t = System.currentTimeMillis();
+long testDurationSec = Long.valueOf(${__P(testDurationSec, 300)}); // default: 300
+long end = testDurationSec * 1000 + t;
+
+FileOutputStream f = new FileOutputStream(&quot;/home/appadmin/user/consumed_msg_&quot; + t + &quot;.csv&quot;, true)
+PrintStream p = new PrintStream(f);
+p.println(&quot;offset, key, value&quot;);
+
+while(System.currentTimeMillis() &lt; end) {
+  ConsumerRecords&lt;String, String&gt; records = consumer.poll(100);
+//  for(ConsumerRecord&lt;String, String&gt; record : records)
+//    p.println(&quot;%d, %s, %s&quot;, record.offset(), record.key(), record.value());
+  consumer.commitSync();
+}
+
+consumer.close();
+p.close();
+f.close();
+</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+        </hashTree>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If End" enabled="true">
+          <stringProp name="IfController.condition">${__groovy(ctx.getThreadGroup().getSamplerController().getProperty(&apos;LoopController.loops&apos;).toString() as int == (vars.get(&apos;__jm__Thread Group__idx&apos;) as int) + 1,)}</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
+        </IfController>
+        <hashTree>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="end" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">
+
+log.info(&quot;DONE!&quot;);</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
