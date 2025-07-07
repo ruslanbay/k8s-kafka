@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jmeter
+  labels:
+    app: jmeter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jmeter
+  template:
+    metadata:
+      labels:
+        app: jmeter
+    spec:
+      volumes:
+      - name: tests
+        hostPath:
+          path: ${TESTS_PATH}
+          type: Directory
+      - name: certs-user
+        secret:
+          secretName: user-my-cluster
+      - name: certs-cluster
+        secret:
+          secretName: my-cluster-cluster-ca-cert
+      containers:
+      - name: consumer
+        image: ghcr.io/ruslanbay/k8s-kafka:latest
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: tests
+          mountPath: /tests
+          readOnly: false
+        - name: certs-user
+          mountPath: /certs/user
+        - name: certs-cluster
+          mountPath: /certs/cluster
+        # securityContext:
+        #   runAsNonRoot: true
+        #   runAsUser: 1000
+        #   allowPrivilegeEscalation: false
+        #   capabilities:
+        #     drop:
+        #       - ALL
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          /bin/sh /tests/jmeter-tests.sh \
+            --enable-logging \
+            --client-type consumer \
+            --test-duration-sec 300 \
+            --topic-name my-topic \
+            --consumer-group-id my-group \
+            --threads-number 1
+      - name: producer
+        image: ghcr.io/ruslanbay/k8s-kafka:latest
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: tests
+          mountPath: /tests
+        - name: certs-user
+          mountPath: /certs/user
+        - name: certs-cluster
+          mountPath: /certs/cluster
+        # securityContext:
+        #   runAsNonRoot: true
+        #   runAsUser: 1000
+        #   allowPrivilegeEscalation: false
+        #   capabilities:
+        #     drop:
+        #       - ALL
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          /bin/sh /tests/jmeter-tests.sh \
+            --client-type producer \
+            --test-duration-sec 300 \
+            --topic-name my-topic \
+            --threads-number 1 \
+            --msg-rate-per-thread 10 \
+            --msg-size-bytes 512

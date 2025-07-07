@@ -1,0 +1,101 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaMirrorMaker2
+metadata:
+  name: my-mirror-maker2
+# Deployment specifications
+spec:
+  # Replicas (required)
+  replicas: 1
+  # Connect cluster name (required)
+  connectCluster: "backup-cluster" # (2)
+  # Cluster configurations (required)
+  clusters: # (3)
+    - alias: "my-cluster" # (4)
+      # Authentication (optional)
+      authentication: # (5)
+        certificateAndKey:
+          certificate: user.crt
+          key: user.key
+          secretName: user-my-cluster
+        type: tls
+      bootstrapServers: "my-cluster-kafka-bootstrap:9093" # (6)
+      # TLS configuration (optional)
+      tls: # (7)
+        trustedCertificates:
+          - pattern: "*.crt"
+            secretName: my-cluster-cluster-ca-cert
+    - alias: "backup-cluster" # (8)
+      # Authentication (optional)
+      authentication: # (9)
+        certificateAndKey:
+          certificate: user.crt
+          key: user.key
+          secretName: user-backup-cluster
+        type: tls
+      bootstrapServers: "backup-cluster-kafka-bootstrap:9093" # (10)
+      # Kafka Connect configuration (optional)
+      config: # (11)
+        config.storage.replication.factor: 1
+        offset.storage.replication.factor: 1
+        status.storage.replication.factor: 1
+      # TLS configuration (optional)
+      tls: # (12)
+        trustedCertificates:
+          - pattern: "*.crt"
+            secretName: backup-cluster-cluster-ca-cert
+  # Mirroring configurations (required)
+  mirrors: # (13)
+    - sourceCluster: "my-cluster" # (14)
+      targetCluster: "backup-cluster" # (15)
+      # Topic and group patterns (required)
+      topicsPattern: "my-topic|topic1|topic2|topic3" # (16)
+      groupsPattern: "my-group|group1|group2|group3" # (17)
+      # Source connector configuration (required)
+      sourceConnector: # (18)
+        tasksMax: 10 # (19)
+        autoRestart: # (20)
+          enabled: true
+        config:
+          replication.factor: 1 # (21)
+          offset-syncs.topic.replication.factor: 1 # (22)
+          sync.topic.acls.enabled: "false" # (23)
+          refresh.topics.interval.seconds: 60 # (24)
+          replication.policy.class: "org.apache.kafka.connect.mirror.IdentityReplicationPolicy" # (25)
+      # Heartbeat connector configuration (optional)
+      heartbeatConnector: # (26)
+        autoRestart:
+          enabled: true
+        config:
+          heartbeats.topic.replication.factor: 1 # (27)
+          replication.policy.class: "org.apache.kafka.connect.mirror.IdentityReplicationPolicy"
+      # Checkpoint connector configuration (optional)
+      checkpointConnector: # (28)
+        autoRestart:
+          enabled: true
+        config:
+          checkpoints.topic.replication.factor: 1 # (29)
+          refresh.groups.interval.seconds: 600 # (30)
+          sync.group.offsets.enabled: true # (31)
+          sync.group.offsets.interval.seconds: 60 # (32)
+          emit.checkpoints.interval.seconds: 60 # (33)
+          replication.policy.class: "org.apache.kafka.connect.mirror.IdentityReplicationPolicy"
+  # Kafka version (recommended)
+  version: 4.0.0 # (34)
+  # Logging configuration (optional)
+  logging: # (36)
+    type: inline
+    loggers:
+      # Kafka 4.0+ uses Log4j2
+      rootLogger.level: INFO
+  # Readiness probe (optional)
+  readinessProbe: # (37)
+    initialDelaySeconds: 15
+    timeoutSeconds: 5
+  # Liveness probe (optional)
+  livenessProbe:
+    initialDelaySeconds: 15
+    timeoutSeconds: 5
+  # JVM options (optional)
+  jvmOptions: # (38)
+    "-Xmx": "1g"
+    "-Xms": "1g"
