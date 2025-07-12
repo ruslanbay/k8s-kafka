@@ -136,6 +136,15 @@ curl "https://raw.githubusercontent.com/helm/helm/${HELM_VERSION}/scripts/get-he
 
 ## Enable Zram <sup>[docs](https://wiki.alpinelinux.org/wiki/Zram)</sup>
 
+### Permanently Disable the Default Swap Partition
+First we need to disable the swap partition that is created by default:
+```shell
+swapoff -a
+sed -i '/swap/ s/^/#/' /etc/fstab
+```
+After disabling swap and commenting out the swap entry, `reboot` your system to ensure swap is completely disabled.
+
+### Enable Zram
 The zram module creates RAM-based block devices named /dev/zram<id> (<id> = 0, 1, ...). Pages written to these disks are compressed and stored in memory itself. These disks allow very fast I/O and compression provides good amounts of memory savings.
 
 For a basic ZRAM swap, configure ZRAM by editing the file `/etc/conf.d/zram-init` as follows:
