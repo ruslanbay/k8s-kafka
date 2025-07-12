@@ -3,6 +3,10 @@
 ## Virtual Machine Deployment
 
 ```shell
+sudo dnf install -y --setopt=install_weak_deps=FALSE \
+  qemu-system-x86_64 \
+  qemu-img
+
 VM_NAME=alpine-k0s
 VM_DIR="${HOME}/VMs"
 CPU_CORES=2
